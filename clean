@@ -1,0 +1,2 @@
+rm sacformat/*.class
+rm *.class

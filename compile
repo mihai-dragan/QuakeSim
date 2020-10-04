@@ -1,0 +1,3 @@
+
+javac sacformat/*.java
+javac -cp ./lib/*:. *.java
