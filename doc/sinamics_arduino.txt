@@ -1,0 +1,110 @@
+Hallo,
+
+ich versuche seit ein paar Tagen einen Simatics V20 via Modbus an zu steuern jedoch reagiert dieser nicht. 
+Einstellung im Menü habe ich gemacht. Baud 9600, Slave 2.... 
+Ein anderes gerät einer Fremdfirma läuft also kann ich den Bus ausschließen. 
+Jetzt kommt das Problem. Ich arbeite mit einem Arduino MegaBoard. 
+wie kann ich in C oder C++ den V20 ein Lebenszeichen einhauchen? 
+Ich hab hier mal den Code gepostet den ich zu testzwecken verwende. 
+Auf dem Ozilloskop sind die Daten zu sehen aber der V20 Schweigt. 
+In welcher Form muss ich die Daten übergeben. Danke schon im voraus.
+
+Grüße
+
+#include <ModbusMaster.h>
+
+#define Freg_Ref (40003)
+#define Run_Enable (40004)
+
+int SerialModbus=3;
+
+ModbusMaster Luft(SerialModbus, 2);
+
+void setup()
+{
+
+Luft.begin(9600);
+
+void loop()
+{
+
+// 0-1 = Aus -An
+
+Luft.writeSingleRegister(Run_Enable , 1 );
+
+// 0-100%
+
+Luft.writeSingleRegister(Freg_Ref  , 50);             
+
+delay(100);
+
+}
+
+Und schon eine Lösung gefunden ???????
+
+
+Folgende Parameter mußt Du im V20 einstellen..
+
+P0003 Anwender-Zugriffsstufe = 3 damit Dir alle angezeigt werden.
+P0700 Auswahl der Befehlsquelle   = 5: USS/MODBUS an RS485
+P1000 Auswahl des Frequenzsollwertes = 5: USS/MODBUS an RS485
+P2010[0] USS/MODBUS-Baudrate = 6: 9600 bit/s (Werkseinstellung)
+P2014[0] USS/MODBUS-Telegramm-Auszeit = 1000 ms
+P2021 Modbus-Adresse = 1 oder was Du willst
+P2022 Zeitüberschreitung für Modbus-Antwort = 1000 ms
+
+Für dich sind folgende Modbus-Adressen wichtig um erstmal Leben in die Kiste zu bekommen
+
+Zum Umrichter schreiben
+40100  Steuerwort
+40101  Sollwert  hier sind 16384 (Hex 4000) = 100%
+
+Bei dem Steuerwort mußt du wissen das die Bytes vertauscht sind (High-/ und Low Byte ) heißt in Bits:
+
+BIT8 JOG rechts
+BIT9 JOG links
+BIT10 Regelung von PLC
+BIT11 Umkehren (Sollwert-Invertierung)
+BIT12 nicht Belegt
+BIT13 Motorpotenziometer höher (MOP höher)
+BIT14 Motorpotenziometer tiefer (MOP tiefer)
+BIT15 CDS Bit 0 (Hand/Auto)
+BIT0 ON/OFF1
+BIT1 OFF2: Zum Stillstand auslaufen
+BIT2 OFF3: Schnellhalt
+BIT3 Impuls aktivieren
+BIT4 Hochlaufgeber aktivieren
+BIT5 Hochlaufgeber starten
+BIT6 Sollwert aktivieren
+BIT7 Fehlerquittierung
+
+Damit der Umrichter läuft müssen auf alle Fälle folgende Bit auf immer 1 gesetzt werden
+Bit 1,2,3,4,5,6 diese Bits müssen immer auf TRUE gesetzt sein
+
+Bit 0 nimmst du dann zum Ein/Aus
+Bit 7 für Fehlerquittierung
+
+Vom Umrichter lesen
+
+40110 Zustandswort
+Bei dem Zustandswort mußt du wissen das die Bytes vertauscht sind (High-/ und Low Byte) heißt in Bits:
+
+BIT8 Sollwert/Istwert-Abweichung
+BIT9 PZD-Regelung
+BIT10 |f_act| >= P1082 (f_max)
+BIT11 Warnung: Motorstrom-/Drehmomentbegrenzung
+BIT12 Bremse gelüftet
+BIT13 Motorüberlast
+BIT14 Motor Rechtslauf
+BIT15 Umrichterüberlast
+BIT0 Umrichter bereit
+BIT1 Umrichter betriebsbereit
+BIT2 Umrichter in Betrieb
+BIT3 Umrichterfehler aktiv
+BIT4 OFF2 aktiv
+BIT5 OFF3 aktiv
+
+40111 Istdrehzahl hier gilt auch wieder 16384 (Hex 4000) = 100%
+
+
+Mit Deinen Adressen 40003 und 40004 klappt das nicht auf den Trick bin ich auch einmal reingefallen
