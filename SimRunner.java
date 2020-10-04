@@ -27,12 +27,12 @@ public class SimRunner extends Thread {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         int slaveId = 1;
         try {
-            //~ m.writeSingleRegister(slaveId, 99, 1150); // start control in OFF state
-            //~ Thread.sleep(80);
-            //~ m.writeSingleRegister(slaveId, 100, 0); // set freq% to 0
-            //~ Thread.sleep(80);
-            //~ m.writeSingleRegister(slaveId, 99, 1151); // control in ON
-            //~ Thread.sleep(80);
+            m.writeSingleRegister(slaveId, 99, 1150); // start control in OFF state
+            Thread.sleep(80);
+            m.writeSingleRegister(slaveId, 100, 800); // set freq% to 800
+            Thread.sleep(80);
+            m.writeSingleRegister(slaveId, 99, 1151); // control in ON
+            Thread.sleep(80);
             int sDelta = new BigDecimal(data.getHeader().getDelta()).multiply(new BigDecimal(1000)).intValue() + 1;
             String startTime = String.format("%04d/%02d/%02d %02d:%02d:%02d.%03d",
                 data.getHeader().getNzyear(),
@@ -60,14 +60,14 @@ public class SimRunner extends Thread {
                     if(started || tChng > 3) {
                         System.out.print(sdf.format(new Date(System.currentTimeMillis())) + "\t\t");
                         System.out.printf("%d\n",(tChng*500)/(tDelta/1000));
-                        //~ while(true) {
-                            //~ try {
-                                //~ m.writeSingleRegister(slaveId, 100, (tChng*500)/(tDelta/1000)); // set freq% to ...
-                                //~ break;
-                            //~ } catch(ModbusIOException miex) {
+                        while(true) {
+                            try {
+                                m.writeSingleRegister(slaveId, 100, (tChng*500)/(tDelta/1000)); // set freq% to ...
+                                break;
+                            } catch(ModbusIOException miex) {
                                 
-                            //~ }
-                        //~ }
+                            }
+                        }
                         Thread.sleep(2960);
                         started = true;
                     }
@@ -101,11 +101,10 @@ public class SimRunner extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            //~ try {
-                //~ m.disconnect();
-            //~ } catch (ModbusIOException e1) {
-                //~ e1.printStackTrace();
-            //~ }
+            m.writeSingleRegister(slaveId, 100, 800); // set freq% to 0
+            Thread.sleep(80);
+            m.writeSingleRegister(slaveId, 99, 1150); // start control in OFF state
+            Thread.sleep(80);
         }
     }
     
