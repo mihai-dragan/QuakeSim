@@ -89,9 +89,7 @@ public class SACPlot {
             e.printStackTrace();
         }
 
-//        if(img == null) {
-            img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-//        }
+        img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
 
         drawImage(data.y);
     }
@@ -102,10 +100,10 @@ public class SACPlot {
 
     public static void main(String[] args) throws Exception {
         ModbusMaster m = null;
-        //SerialParameters sp = loadSerialParameters();
-        //SerialUtils.setSerialPortFactory(new SerialPortFactoryJSSC());
-        //ModbusMaster m = ModbusMasterFactory.createModbusMasterRTU(sp);
-        //m.connect();
+        SerialParameters sp = loadSerialParameters();
+        SerialUtils.setSerialPortFactory(new SerialPortFactoryJSSC());
+        ModbusMaster m = ModbusMasterFactory.createModbusMasterRTU(sp);
+        m.connect();
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -163,7 +161,7 @@ public class SACPlot {
                         while(true) {
                             try {
                                 System.out.println(ev.getValue());
-                                //m.writeSingleRegister(slaveId, 100, motorFreq.getValue());
+                                m.writeSingleRegister(slaveId, 100, motorFreq.getValue());
                                 break;
                             } catch(Exception ex) {}
                         }
@@ -179,7 +177,7 @@ public class SACPlot {
                     public void actionPerformed(ActionEvent ae) {
                         while(true) {
                             try {
-                                //m.writeSingleRegister(slaveId, 99, 1151); // control in ON
+                                m.writeSingleRegister(slaveId, 99, 1151); // control in ON
                                 break;
                             } catch(Exception ex) {}
                         }
@@ -194,7 +192,7 @@ public class SACPlot {
                     public void actionPerformed(ActionEvent ae) {
                         while(true) {
                             try {
-                                //m.writeSingleRegister(slaveId, 99, 1150); // start control in OFF state
+                                m.writeSingleRegister(slaveId, 99, 1150); // start control in OFF state
                                 break;
                             } catch(Exception ex) {}
                         }
@@ -203,7 +201,7 @@ public class SACPlot {
                         } catch (Exception e) {}
                         while(true) {
                             try {
-                                //m.writeSingleRegister(slaveId, 100, 800); // set freq% to 800
+                                m.writeSingleRegister(slaveId, 100, 800); // set freq% to 800
                                 break;
                             } catch(Exception ex) {}
                         }
