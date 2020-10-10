@@ -99,7 +99,6 @@ public class SACPlot {
     }
 
     public static void main(String[] args) throws Exception {
-        ModbusMaster m = null;
         SerialParameters sp = loadSerialParameters();
         SerialUtils.setSerialPortFactory(new SerialPortFactoryJSSC());
         ModbusMaster m = ModbusMasterFactory.createModbusMasterRTU(sp);

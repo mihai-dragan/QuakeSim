@@ -101,10 +101,12 @@ public class SimRunner extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            m.writeSingleRegister(slaveId, 100, 800); // set freq% to 0
-            Thread.sleep(80);
-            m.writeSingleRegister(slaveId, 99, 1150); // start control in OFF state
-            Thread.sleep(80);
+            try {
+                m.writeSingleRegister(slaveId, 100, 800); // set freq% to 0
+                Thread.sleep(80);
+                m.writeSingleRegister(slaveId, 99, 1150); // start control in OFF state
+                Thread.sleep(80);
+            } catch(Exception e) {}
         }
     }
     
